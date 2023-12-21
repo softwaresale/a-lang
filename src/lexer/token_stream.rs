@@ -2,17 +2,17 @@ use crate::error::source::SourceError;
 use crate::location::SourceRange;
 use crate::token::{Token, TokenKind};
 
-pub struct TokenStream {
+pub struct TokenStream<'input> {
     /// the actual tokens
-    tokens: Vec<Token>,
+    tokens: Vec<Token<'input>>,
     /// where in the token stream we are looking
     cursor: usize,
     /// internal stack for saving cursor locations when backtracking
     cursor_stack: Vec<usize>,
 }
 
-impl TokenStream {
-    pub fn new(tokens: Vec<Token>) -> Self {
+impl<'input> TokenStream<'input> {
+    pub fn new(tokens: Vec<Token<'input>>) -> Self {
         Self {
             tokens,
             cursor: 0,

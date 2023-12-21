@@ -16,12 +16,14 @@ impl SourceLocation {
         self.col = 0;
     }
 
-    pub fn bump(&mut self) {
+    pub fn bump(&mut self) -> Self {
         self.col += 1;
+        self.clone()
     }
 
-    pub fn advance(&mut self, n: usize) {
+    pub fn advance(&mut self, n: usize) -> Self {
         self.col += n;
+        self.clone()
     }
 
     pub fn cr(&mut self) {
@@ -32,7 +34,7 @@ impl SourceLocation {
         match next_ch {
             '\n' => self.newline(),
             '\r' => self.cr(),
-            _ => self.bump(),
+            _ => { self.bump(); },
         };
     }
 }

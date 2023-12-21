@@ -9,6 +9,16 @@ pub enum LiteralKind {
     String
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum LiteralRef<'input> {
+    Unit,
+    Boolean(bool),
+    Char(char),
+    Int(u64),
+    Double(f64),
+    String(&'input str),
+}
+
 #[derive(Clone,Debug, PartialEq)]
 pub enum Literal {
     Unit,

@@ -1,54 +1,14 @@
-use crate::literal::{Literal};
-use crate::location::SourceRange;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Keyword {
-    /// "fun"
-    FunDecl,
-    /// "object"
-    ObjDecl,
-    Composes,
-    If,
-    Else,
-    While,
-    For,
-    In,
-    Let,
-    Const,
-    Mut,
-    Return,
-    Break,
-}
+use crate::literal::{LiteralRef};
+use crate::location::{SourceLocation, SourceRange};
 
-impl TryFrom<&str> for Keyword {
-    type Error = ();
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "fun" => Ok(Keyword::FunDecl),
-            "object" => Ok(Keyword::ObjDecl),
-            "if" => Ok(Keyword::FunDecl),
-            "else" => Ok(Keyword::Else),
-            "while" => Ok(Keyword::While),
-            "for" => Ok(Keyword::For),
-            "in" => Ok(Keyword::In),
-            "let" => Ok(Keyword::Let),
-            "const" => Ok(Keyword::Const),
-            "mut" => Ok(Keyword::Mut),
-            "return" => Ok(Keyword::Return),
-            "break" => Ok(Keyword::Break),
-            _ => Err(())
-        }
-    }
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub enum TokenKind {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum TokenKind<'input> {
     EOF,
     /// identifier
-    Ident(String),
+    Ident(&'input str),
     /// literal value
-    Lit(Literal),
+    Lit(LiteralRef<'input>),
 
     // Delimiters
     Comma,
@@ -98,11 +58,11 @@ pub enum TokenKind {
     Nullable,
 }
 
-impl TryFrom<String> for TokenKind {
-    type Error = String;
+impl<'input> TryFrom<&'input str> for TokenKind<'input> {
+    type Error = &'input str;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
+    fn try_from(value: &'input str) -> Result<Self, Self::Error> {
+        match value {
             "," => Ok(TokenKind::Comma),
             ";" => Ok(TokenKind::Semicolon),
             "(" => Ok(TokenKind::LParen),
@@ -146,19 +106,10 @@ impl TryFrom<String> for TokenKind {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Token {
+#[derive(Clone, Copy, Debug)]
+pub struct Token<'input> {
     /// what kind of token this is
-    pub(crate) kind: TokenKind,
-    /// Where in the input this token occurs
+    pub(crate) kind: TokenKind<'input>,
+    /// where the token occurs in terms of source
     pub(crate) location: SourceRange,
-}
-
-impl Token {
-    pub fn eof() -> Self {
-        Self {
-            kind: TokenKind::EOF,
-            location: Default::default(),
-        }
-    }
 }
