@@ -1,4 +1,5 @@
 use crate::literal::Literal;
+use crate::location::SourceRange;
 use crate::operators::{BinaryOp, UnaryOp};
 use crate::types::{Type, VariableDeclarationMode};
 
@@ -18,6 +19,8 @@ pub struct FunctionDeclarationNode {
     pub(crate) ret_tp: Type,
     /// The function body
     pub(crate) body: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -28,6 +31,8 @@ pub struct ObjectDeclarationNode {
     pub(crate) composition_specs: Vec<Box<Ast>>,
     /// the fields found in this type
     pub(crate) fields: Vec<Box<Ast>>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -36,6 +41,8 @@ pub struct FieldDeclarationNode {
     pub(crate) name: Box<Ast>,
     /// the given type
     pub(crate) tp: Type,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -44,6 +51,8 @@ pub struct CompositionSpecNode {
     pub(crate) composed_type: Box<Ast>,
     /// an optional alias given
     pub(crate) alias: Option<Box<Ast>>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -54,6 +63,8 @@ pub struct VariableDeclarationNode {
     pub(crate) name: Box<Ast>,
     /// the type of this variable
     pub(crate) tp: Type,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -62,18 +73,24 @@ pub struct ParamNode {
     pub(crate) name: Box<Ast>,
     /// the type of this parameter
     pub(crate) tp: Type,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
 pub struct AssignmentNode {
     pub(crate) decl: Box<Ast>,
-    pub(crate) rhs: Box<Ast>
+    pub(crate) rhs: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
 pub struct UnaryOpNode {
     pub(crate) op: UnaryOp,
     pub(crate) child: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -81,6 +98,8 @@ pub struct BinaryOpNode {
     pub(crate) op: BinaryOp,
     pub(crate) lhs: Box<Ast>,
     pub(crate) rhs: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -91,6 +110,8 @@ pub struct CondExprNode {
     pub(crate) true_branch: Box<Ast>,
     /// the false branch
     pub(crate) false_branch: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -99,6 +120,8 @@ pub struct FunCallNode {
     pub(crate) fun_name: Box<Ast>,
     /// the arguments passed
     pub(crate) args: Vec<Box<Ast>>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -107,6 +130,8 @@ pub struct NamedArgNode {
     pub(crate) param_name: Box<Ast>,
     /// the value we are passing
     pub(crate) value: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -115,6 +140,28 @@ pub struct WhileNode {
     pub(crate) cond: Box<Ast>,
     /// the body of the loop
     pub(crate) body: Box<Ast>,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
+}
+
+#[derive(Debug)]
+pub struct IdentNode {
+    pub(crate) ident: String,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
+}
+
+#[derive(Debug)]
+pub struct LitNode {
+    pub(crate) lit: Literal,
+    /// location in source where this node occurs
+    pub(crate) location: SourceRange,
+}
+
+#[derive(Debug)]
+pub struct ReturnNode {
+    pub(crate) expr: Box<Ast>,
+    pub(crate) location: SourceRange,
 }
 
 #[derive(Debug)]
@@ -132,9 +179,9 @@ pub enum Ast {
     BinaryOp(BinaryOpNode),
     CondExpr(CondExprNode),
     While(WhileNode),
-    Identifier(String),
-    Literal(Literal),
+    Identifier(IdentNode),
+    Literal(LitNode),
     FunCall(FunCallNode),
     NamedArg(NamedArgNode),
-    Return(Box<Ast>)
+    Return(ReturnNode)
 }
