@@ -27,7 +27,7 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
     }
      */
 
-    let source_input  = SourceInput::raw("-age $ something else");
+    let source_input  = SourceInput::raw("let const mut age = -age  something else");
     if source_input.contains_non_ascii() {
         eprintln!("Error: input cannot contain non-ascii characters");
         return Ok(ExitCode::FAILURE);

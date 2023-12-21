@@ -190,7 +190,10 @@ impl<'input> Lexer<'input> {
                 } else if other.is_alphabetic() || other == '_' {
                     // try an identifier
                     let ident = self.take_identifier(other);
-                    Ok(TokenKind::Ident(ident))
+                    match TokenKind::try_from(ident) {
+                        Ok(matched_token) => Ok(matched_token),
+                        Err(unmatched) => Ok(TokenKind::Ident(unmatched))
+                    }
                 } else {
                     // unidentified syntax
                     let end = self.location.clone();

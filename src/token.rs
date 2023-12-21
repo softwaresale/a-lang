@@ -80,17 +80,29 @@ pub enum TokenKind {
     Not,
 
     // General keyword token
-    Keyword(Keyword),
+    FunDecl,
+    ObjDecl,
+    Composes,
+    If,
+    Else,
+    While,
+    For,
+    In,
+    Let,
+    Const,
+    Mut,
+    Return,
+    Break,
 
     // Other
     Nullable,
 }
 
-impl TryFrom<&str> for TokenKind {
-    type Error = ();
+impl TryFrom<String> for TokenKind {
+    type Error = String;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.as_str() {
             "," => Ok(TokenKind::Comma),
             ";" => Ok(TokenKind::Semicolon),
             "(" => Ok(TokenKind::LParen),
@@ -117,7 +129,19 @@ impl TryFrom<&str> for TokenKind {
             "||" => Ok(TokenKind::Or),
             "!" => Ok(TokenKind::Not),
             "?" => Ok(TokenKind::Nullable),
-            _ => Err(())
+            "fun" => Ok(TokenKind::FunDecl),
+            "object" => Ok(TokenKind::ObjDecl),
+            "if" => Ok(TokenKind::FunDecl),
+            "else" => Ok(TokenKind::Else),
+            "while" => Ok(TokenKind::While),
+            "for" => Ok(TokenKind::For),
+            "in" => Ok(TokenKind::In),
+            "let" => Ok(TokenKind::Let),
+            "const" => Ok(TokenKind::Const),
+            "mut" => Ok(TokenKind::Mut),
+            "return" => Ok(TokenKind::Return),
+            "break" => Ok(TokenKind::Break),
+            _ => Err(value)
         }
     }
 }
