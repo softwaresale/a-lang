@@ -65,6 +65,14 @@ pub struct SourceRange {
     pub end: SourceLocation,
 }
 
+impl SourceRange {
+    pub fn spanned<StartT: HasLocation, EndT: HasLocation>(start: &StartT, end: &EndT) -> Self {
+        let start = start.source_range().start;
+        let end = end.source_range().end;
+        Self { start, end }
+    }
+}
+
 impl From<(SourceLocation, SourceLocation)> for SourceRange {
     fn from(value: (SourceLocation, SourceLocation)) -> Self {
         Self {
@@ -77,5 +85,15 @@ impl From<(SourceLocation, SourceLocation)> for SourceRange {
 impl Display for SourceRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "from {} to {}", self.start, self.end)
+    }
+}
+
+pub trait HasLocation {
+    fn source_range(&self) -> SourceRange;
+}
+
+impl HasLocation for SourceRange {
+    fn source_range(&self) -> SourceRange {
+        *self
     }
 }

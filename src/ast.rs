@@ -1,5 +1,5 @@
 use crate::literal::Literal;
-use crate::location::SourceRange;
+use crate::location::{HasLocation, SourceRange};
 use crate::operators::{BinaryOp, UnaryOp};
 use crate::types::{Type, VariableDeclarationMode};
 
@@ -184,4 +184,33 @@ pub enum Ast {
     FunCall(FunCallNode),
     NamedArg(NamedArgNode),
     Return(ReturnNode)
+}
+
+impl HasLocation for Ast {
+    fn source_range(&self) -> SourceRange {
+        match self {
+            Ast::CompilationUnit(node) => SourceRange::default(),
+            Ast::FunctionDeclaration(node) => node.location,
+            Ast::ObjectDeclaration(node) => node.location,
+            Ast::FieldDeclaration(node) => node.location,
+            Ast::CompositionSpec(node) => node.location,
+            Ast::VariableDeclaration(node) => node.location,
+            Ast::Param(node) => node.location,
+            Ast::Block(node) => {
+                let start = node.first().map(|ast| ast.source_range()).unwrap();
+                let end = node.last().map(|ast| ast.source_range()).unwrap();
+                SourceRange::spanned(&start, &end)
+            },
+            Ast::Assignment(node) => node.location,
+            Ast::UnaryOp(node) => node.location,
+            Ast::BinaryOp(node) => node.location,
+            Ast::CondExpr(node) => node.location,
+            Ast::While(node) => node.location,
+            Ast::Identifier(node) => node.location,
+            Ast::Literal(node) => node.location,
+            Ast::FunCall(node) => node.location,
+            Ast::NamedArg(node) => node.location,
+            Ast::Return(node) => node.location,
+        }
+    }
 }

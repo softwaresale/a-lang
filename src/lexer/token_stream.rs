@@ -24,9 +24,22 @@ impl<'input> TokenStream<'input> {
         &self.tokens
     }
 
+    pub fn cursor(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn putback(&mut self) {
+        self.putback_n(1)
+    }
+
+    pub fn putback_n(&mut self, n: usize) {
+        self.cursor -= n;
+    }
+
     /// save the current cursor onto the stack
-    pub fn save(&mut self) {
+    pub fn save(&mut self) -> usize {
         self.cursor_stack.push(self.cursor);
+        self.cursor
     }
 
     /// restore a saved cursor into the stored cursor
@@ -51,7 +64,7 @@ impl<'input> TokenStream<'input> {
     }
 
     pub fn accept(&mut self, expected: TokenKind) -> Result<&Token, SourceError> {
-        if let Some(tok) = self.tokens.get(self.cursor) {
+        if let Some(tok) = self.next() {
             if tok.kind == expected {
                 Ok(tok)
             } else {
@@ -59,6 +72,22 @@ impl<'input> TokenStream<'input> {
             }
         } else {
             Err(SourceError::new(format!("Expected '{:?}' but got end of token stream instead", expected), SourceRange::default()))
+        }
+    }
+
+    pub fn accept_if_map<R, PredT: Fn(&Token) -> Result<R, SourceError>>(&mut self, pred: PredT) -> Result<R, SourceError> {
+        if let Some(next) = self.next() {
+            pred(next)
+        } else {
+            Err(SourceError::new(format!("Unexpected end of token stream instead"), SourceRange::default()))
+        }
+    }
+
+    pub fn skip_to<PredT: Fn(&Token) -> bool>(&mut self, pred: PredT) {
+        while let Some(next) = self.next() {
+            if !pred(next) {
+                break;
+            }
         }
     }
 }

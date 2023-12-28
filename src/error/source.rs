@@ -35,3 +35,9 @@ impl Display for SourceError {
 }
 
 impl Error for SourceError {}
+
+impl Into<Vec<SourceError>> for SourceError {
+    fn into(self) -> Vec<SourceError> {
+        vec![self]
+    }
+}

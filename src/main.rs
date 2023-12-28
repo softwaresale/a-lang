@@ -8,13 +8,15 @@ mod location;
 mod operators;
 mod types;
 mod token;
+mod parser;
 
 use std::error::Error;
 use std::process::ExitCode;
-use clap::Parser;
+use clap::Parser as ClapParser;
 use crate::args::ProgramArgs;
 use crate::input::SourceInput;
 use crate::lexer::Lexer;
+use crate::parser::{Parser};
 
 fn main() -> Result<ExitCode, Box<dyn Error>> {
 
@@ -27,7 +29,7 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
     }
      */
 
-    let source_input  = SourceInput::raw("let const mut age = -age 123 something else");
+    let source_input  = SourceInput::raw("foo(age 12)");
     if source_input.contains_non_ascii() {
         eprintln!("Error: input cannot contain non-ascii characters");
         return Ok(ExitCode::FAILURE);
@@ -37,8 +39,24 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
     let token_stream = Lexer::new(&source_input)
         .into_token_stream()?;
 
+    println!("--Tokens--");
     for token in token_stream.tokens() {
         println!("{:?}", token)
+    }
+    println!("--End Tokens--");
+
+    let mut parser = Parser::new(token_stream);
+    let ast = parser.parse_compilation_unit();
+    match ast {
+        Ok(ast) => {
+            println!("--AST--");
+            println!("{:?}", ast);
+        }
+        Err(errors) => {
+            for error in errors {
+                eprintln!("Error: {}", error)
+            }
+        }
     }
 
     Ok(ExitCode::SUCCESS)
