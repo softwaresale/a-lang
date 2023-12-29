@@ -9,9 +9,9 @@ object Student composes Person {
 }
 
 fun main() {
-    let age = 12;
-    while (age > 0) {
-        age = age - 1;
-    };
-    age
+    let age: uint = 12;
+    let age: (uint) = 13;
+    let my_age: &uint = &age;
+    let my_ages: ([]uint)? = null;
+    let my_ages_ref: &([]uint)? = &my_ages;
 }

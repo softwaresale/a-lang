@@ -43,6 +43,8 @@ pub enum Type {
     Function(FunType),
     /// A sized array type
     Array(Box<Type>, usize),
+    /// A variable sized, non-owning view of contiguous memory
+    View(Box<Type>),
     /// user defined non-scalar type
     UserDefined(String),
 }
