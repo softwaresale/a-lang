@@ -1,17 +1,22 @@
 mod expr;
 mod funs;
+mod stmt;
+mod tp;
 
 use std::collections::HashMap;
 use crate::ast::{Ast};
+use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
 use crate::lexer::token_stream::TokenStream;
 use crate::token::TokenKind;
 
-pub type ParseResult = Result<Box<Ast>, Vec<SourceError>>;
+pub type ParseResult = Result<Box<Ast>, ParseErr>;
 
 pub struct Parser<'input> {
     /// the stream of input tokens available to us
     tokens: TokenStream<'input>,
+    /// source errors we have encountered along the way
+    errors: Vec<SourceError>,
 }
 
 // Basic utility functions for parser
@@ -19,21 +24,26 @@ pub struct Parser<'input> {
 impl<'input> Parser<'input> {
     pub fn new(tokens: TokenStream<'input>) -> Self {
         Self {
-            tokens
+            tokens,
+            errors: Vec::default()
         }
     }
 
     // parse rules
-    pub fn parse_compilation_unit(&mut self) -> ParseResult {
-        self.parse_atom()
+    pub fn parse_compilation_unit(mut self) -> Result<Box<Ast>, Vec<SourceError>> {
+        let parse_result = self.parse_expr();
+        match parse_result {
+            Ok(ast) => Ok(ast),
+            Err(_) => Err(self.errors)
+        }
     }
 
     // parsing utilities
     pub(crate) fn one_of<const COUNT: usize>(&mut self, actions: [fn(&mut Self) -> ParseResult; COUNT]) -> ParseResult {
+        let mut distances = [0usize; COUNT];
+        let mut errors = HashMap::<usize, SourceError>::with_capacity(COUNT);
 
-        let mut error_map = HashMap::<usize, Vec<SourceError>>::new();
-
-        for action in actions {
+        for (idx, action) in actions.iter().enumerate() {
             let starting = self.tokens.save();
             let result = action(self);
             match result {
@@ -41,17 +51,29 @@ impl<'input> Parser<'input> {
                     return Ok(matched)
                 }
                 Err(err) => {
-                    // figure out the longest
-                    let distance = self.tokens.cursor() - starting;
-                    error_map.insert(distance, err);
-                    self.tokens.restore();
+                    match err {
+                        ParseErr::Fatal(fatal_error) => {
+                            return Err(ParseErr::Fatal(fatal_error))
+                        }
+                        ParseErr::NonFatal(non_fatal_error) => {
+                            let distance = self.tokens.cursor() - starting;
+                            distances[idx] = distance;
+                            errors.insert(idx, non_fatal_error);
+                            self.tokens.restore();
+                        }
+                    }
                 }
             }
         }
 
-        let max_key = *error_map.keys().max().unwrap();
-        let errors = error_map.remove(&max_key).unwrap();
-        Err(errors)
+        let error_idx = distances.into_iter()
+            .enumerate()
+            .max_by_key(|(_, dist)| *dist)
+            .map(|(idx, _)| idx)
+            .unwrap();
+        let err = errors.remove(&error_idx).unwrap();
+        // self.errors.push(err.clone());
+        Err(ParseErr::Fatal(err))
     }
 
     /// parse a repeated rule
@@ -63,7 +85,7 @@ impl<'input> Parser<'input> {
         rule: fn(&mut Self) -> ParseResult,
         delimiter: TokenKind,
         stop_token: TokenKind
-    ) -> Result<Vec<Box<Ast>>, Vec<SourceError>> {
+    ) -> Result<Vec<Box<Ast>>, ParseErr> {
         let mut items = Vec::<Box<Ast>>::new();
         loop {
             // if next token is the stop token, we are done
@@ -72,8 +94,25 @@ impl<'input> Parser<'input> {
             }
 
             // otherwise, parse the item
-            let item = rule(self)?;
-            items.push(item);
+            let item = rule(self);
+            match item {
+                Ok(item) => {
+                    items.push(item);
+                }
+                Err(parse_err) => {
+                    match parse_err {
+                        ParseErr::Fatal(fatal_err) => {
+                            self.errors.push(fatal_err);
+                        }
+                        ParseErr::NonFatal(non_fatal_error) => {
+                            self.errors.push(non_fatal_error);
+                        }
+                    }
+
+                    // error recovery: skip to either the next delim or stop token
+                    self.tokens.skip_to(|tok| tok.kind == delimiter || tok.kind == stop_token)
+                }
+            }
 
             // find the delimiter
             let next_token = self.tokens.next().unwrap();
@@ -83,7 +122,7 @@ impl<'input> Parser<'input> {
             } else if next_token.kind != delimiter {
                 // we have an error
                 let err = SourceError::new(format!("Expected '{:?}' or '{:?}', but got '{:?}' instead", delimiter, stop_token, next_token.kind), next_token.location);
-                return Err(vec![err]);
+                return Err(ParseErr::Fatal(err));
             }
         }
 

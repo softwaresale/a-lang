@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 use crate::location::{SourceRange};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SourceError {
     /// the actual error message to display to the user
     msg: String,

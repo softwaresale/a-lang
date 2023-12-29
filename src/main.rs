@@ -22,14 +22,12 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
 
     let args = ProgramArgs::parse();
 
-    /*
     if args.input_files.is_empty() {
         println!("No input files. Nothing to do");
         return Ok(ExitCode::SUCCESS)
     }
-     */
 
-    let source_input  = SourceInput::raw("foo(age 12)");
+    let source_input  = SourceInput::open(args.input_files.first().unwrap())?;
     if source_input.contains_non_ascii() {
         eprintln!("Error: input cannot contain non-ascii characters");
         return Ok(ExitCode::FAILURE);
@@ -45,14 +43,15 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
     }
     println!("--End Tokens--");
 
-    let mut parser = Parser::new(token_stream);
+    let parser = Parser::new(token_stream);
     let ast = parser.parse_compilation_unit();
     match ast {
         Ok(ast) => {
             println!("--AST--");
-            println!("{:?}", ast);
+            println!("{:#?}", ast);
         }
         Err(errors) => {
+            eprintln!("Parsing error occurred");
             for error in errors {
                 eprintln!("Error: {}", error)
             }

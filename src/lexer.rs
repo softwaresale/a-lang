@@ -182,6 +182,7 @@ impl<'input> Lexer<'input> {
 
                 let ending_char = self.input.next();
                 if ending_char.is_some_and(|ch| ch == '"') {
+                    self.index += 1;
                     self.location.bump();
                     Ok(TokenKind::Lit(LiteralRef::String(buffer)))
                 } else {

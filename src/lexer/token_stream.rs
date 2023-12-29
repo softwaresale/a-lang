@@ -1,3 +1,4 @@
+use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
 use crate::location::SourceRange;
 use crate::token::{Token, TokenKind};
@@ -49,10 +50,18 @@ impl<'input> TokenStream<'input> {
         }
     }
 
+    pub fn advance(&mut self, amount: usize) {
+        self.cursor += amount
+    }
+
     pub fn next(&mut self) -> Option<&Token> {
         let token = self.tokens.get(self.cursor);
         self.cursor += 1;
         token
+    }
+
+    pub fn peek(&self) -> Option<&Token> {
+        self.tokens.get(self.cursor)
     }
 
     pub fn check_next<PredT: Fn(&Token) -> bool>(&self, pred: PredT) -> bool {
@@ -75,17 +84,19 @@ impl<'input> TokenStream<'input> {
         }
     }
 
-    pub fn accept_if_map<R, PredT: Fn(&Token) -> Result<R, SourceError>>(&mut self, pred: PredT) -> Result<R, SourceError> {
+    pub fn accept_if_map<R, PredT: Fn(&Token) -> Result<R, ParseErr>>(&mut self, pred: PredT) -> Result<R, ParseErr> {
         if let Some(next) = self.next() {
             pred(next)
         } else {
-            Err(SourceError::new(format!("Unexpected end of token stream instead"), SourceRange::default()))
+            let err = SourceError::new(format!("Unexpected end of token stream instead"), SourceRange::default());
+            Err(ParseErr::Fatal(err))
         }
     }
 
+    /// skip tokens until the given predicate evaluates to true
     pub fn skip_to<PredT: Fn(&Token) -> bool>(&mut self, pred: PredT) {
         while let Some(next) = self.next() {
-            if !pred(next) {
+            if pred(next) {
                 break;
             }
         }

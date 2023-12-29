@@ -1,0 +1,7 @@
+
+if (true) {
+    let age = 10;
+    let name = "Charlie";
+} else {
+    let age = 11;
+}

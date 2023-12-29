@@ -62,7 +62,7 @@ pub struct VariableDeclarationNode {
     /// the name of this variable
     pub(crate) name: Box<Ast>,
     /// the type of this variable
-    pub(crate) tp: Type,
+    pub(crate) tp: Box<Ast>,
     /// location in source where this node occurs
     pub(crate) location: SourceRange,
 }
@@ -165,6 +165,23 @@ pub struct ReturnNode {
 }
 
 #[derive(Debug)]
+pub struct ArrayAccessNode {
+    /// the expression being accessed
+    pub(crate) derefed: Box<Ast>,
+    /// the expression used to access the array
+    pub(crate) access: Box<Ast>,
+    /// source location
+    pub(crate) location: SourceRange,
+}
+
+#[derive(Debug)]
+pub struct TypeSpecNode {
+    /// the type of this spec
+    pub(crate) tp: Type,
+    pub(crate) location: SourceRange,
+}
+
+#[derive(Debug)]
 pub enum Ast {
     CompilationUnit(CompilationUnitNode),
     FunctionDeclaration(FunctionDeclarationNode),
@@ -183,7 +200,9 @@ pub enum Ast {
     Literal(LitNode),
     FunCall(FunCallNode),
     NamedArg(NamedArgNode),
-    Return(ReturnNode)
+    Return(ReturnNode),
+    ArrayAccess(ArrayAccessNode),
+    TypeSpec(TypeSpecNode),
 }
 
 impl HasLocation for Ast {
@@ -211,6 +230,8 @@ impl HasLocation for Ast {
             Ast::FunCall(node) => node.location,
             Ast::NamedArg(node) => node.location,
             Ast::Return(node) => node.location,
+            Ast::ArrayAccess(node) => node.location,
+            Ast::TypeSpec(node) => node.location,
         }
     }
 }

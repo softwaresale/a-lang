@@ -1,6 +1,6 @@
 
 use crate::literal::{LiteralRef};
-use crate::location::{SourceLocation, SourceRange};
+use crate::location::{HasLocation, SourceLocation, SourceRange};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TokenKind<'input> {
@@ -91,7 +91,7 @@ impl<'input> TryFrom<&'input str> for TokenKind<'input> {
             "?" => Ok(TokenKind::Nullable),
             "fun" => Ok(TokenKind::FunDecl),
             "object" => Ok(TokenKind::ObjDecl),
-            "if" => Ok(TokenKind::FunDecl),
+            "if" => Ok(TokenKind::If),
             "else" => Ok(TokenKind::Else),
             "while" => Ok(TokenKind::While),
             "for" => Ok(TokenKind::For),
@@ -112,4 +112,10 @@ pub struct Token<'input> {
     pub(crate) kind: TokenKind<'input>,
     /// where the token occurs in terms of source
     pub(crate) location: SourceRange,
+}
+
+impl<'input> HasLocation for Token<'input> {
+    fn source_range(&self) -> SourceRange {
+        self.location
+    }
 }
