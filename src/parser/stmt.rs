@@ -19,12 +19,20 @@ impl<'input> Parser<'input> {
     }
 
     pub(crate) fn parse_stmt(&mut self) -> ParseResult {
-        self.one_of([
+        let stmt_result = self.one_of([
             Self::parse_block,
             Self::parse_while,
             Self::parse_assignment_stmt,
             Self::parse_expr_stmt,
-        ])
+        ]);
+
+        match stmt_result {
+            Ok(stmt) => Ok(stmt),
+            Err(err) => {
+                self.errors.push(err.clone().into());
+                Err(err)
+            }
+        }
     }
 
     fn parse_assignment_stmt(&mut self) -> ParseResult {
