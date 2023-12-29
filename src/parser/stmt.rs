@@ -1,4 +1,4 @@
-use crate::ast::{AssignmentNode, Ast, TypeSpecNode, VariableDeclarationNode};
+use crate::ast::{AssignmentNode, Ast, TypeSpecNode, VariableDeclarationNode, WhileNode};
 use crate::error::parse::ParseErr;
 use crate::location::SourceRange;
 use crate::parser::{Parser, ParseResult};
@@ -21,6 +21,7 @@ impl<'input> Parser<'input> {
     pub(crate) fn parse_stmt(&mut self) -> ParseResult {
         self.one_of([
             Self::parse_block,
+            Self::parse_while,
             Self::parse_assignment_stmt,
             Self::parse_expr_stmt,
         ])
@@ -72,6 +73,31 @@ impl<'input> Parser<'input> {
             decl_mode: VariableDeclarationMode::Const,
             name: var_name,
             tp: type_spec,
+            location: loc,
+        }).into())
+    }
+
+    /// <while_loop> ::= "while" "(" <expr> ")" <block>
+    fn parse_while(&mut self) -> ParseResult {
+        let start_location = self.tokens.accept(TokenKind::While)
+            .map(|tok| tok.location)
+            .map_err(|err| ParseErr::NonFatal(err))?;
+
+        self.tokens.accept(TokenKind::LParen)
+            .map_err(|err| ParseErr::Fatal(err))?;
+
+        let cond = self.parse_expr()?;
+
+        self.tokens.accept(TokenKind::RParen)
+            .map_err(|err| ParseErr::Fatal(err))?;
+
+        let body = self.parse_block()?;
+
+        let loc = SourceRange::spanned(&start_location, body.as_ref());
+
+        Ok(Ast::While(WhileNode {
+            cond,
+            body,
             location: loc,
         }).into())
     }
