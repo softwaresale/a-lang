@@ -104,6 +104,9 @@ impl<'input> TryFrom<&'input str> for TokenKind<'input> {
             "break" => Ok(TokenKind::Break),
             "as" => Ok(TokenKind::As),
             "composes" => Ok(TokenKind::Composes),
+            "true" => Ok(TokenKind::Lit(LiteralRef::Boolean(true))),
+            "false" => Ok(TokenKind::Lit(LiteralRef::Boolean(false))),
+            "null" => Ok(TokenKind::Lit(LiteralRef::Null)),
             _ => Err(value)
         }
     }

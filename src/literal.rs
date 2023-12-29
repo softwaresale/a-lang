@@ -2,6 +2,7 @@
 #[derive(Copy, Clone)]
 pub enum LiteralKind {
     Unit,
+    Null,
     Boolean,
     Char,
     Int,
@@ -12,6 +13,7 @@ pub enum LiteralKind {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum LiteralRef<'input> {
     Unit,
+    Null,
     Boolean(bool),
     Char(char),
     Int(u64),
@@ -23,11 +25,12 @@ impl<'input> Into<Literal> for LiteralRef<'input> {
     fn into(self) -> Literal {
         match self {
             LiteralRef::Unit => Literal::Unit,
+            LiteralRef::Null => Literal::Null,
             LiteralRef::Boolean(bool) => Literal::Boolean(bool),
             LiteralRef::Char(ch) => Literal::Char(ch),
             LiteralRef::Int(int) => Literal::Int(int),
             LiteralRef::Double(db) => Literal::Double(db),
-            LiteralRef::String(str_ref) => Literal::String(str_ref.to_string())
+            LiteralRef::String(str_ref) => Literal::String(str_ref.to_string()),
         }
     }
 }
@@ -35,6 +38,7 @@ impl<'input> Into<Literal> for LiteralRef<'input> {
 #[derive(Clone,Debug, PartialEq)]
 pub enum Literal {
     Unit,
+    Null,
     Boolean(bool),
     Char(char),
     Int(u64),
