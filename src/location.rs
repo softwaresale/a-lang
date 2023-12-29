@@ -52,7 +52,7 @@ impl Ord for SourceLocation {
 
 impl Display for SourceLocation {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "line {}, col {}", self.line, self.col)
+        write!(f, "{}:{}", self.line, self.col)
     }
 }
 
@@ -84,7 +84,13 @@ impl From<(SourceLocation, SourceLocation)> for SourceRange {
 
 impl Display for SourceRange {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "from {} to {}", self.start, self.end)
+        write!(f, "{}-{}", self.start, self.end)
+    }
+}
+
+impl PartialOrd for SourceRange {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.start.partial_cmp(&other.start)
     }
 }
 

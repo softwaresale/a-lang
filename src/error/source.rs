@@ -25,6 +25,16 @@ impl SourceError {
         self.context_loc = Some(loc);
         self
     }
+
+    pub fn msg(&self) -> &str {
+        &self.msg
+    }
+    pub fn err_loc(&self) -> SourceRange {
+        self.err_loc
+    }
+    pub fn context_loc(&self) -> Option<SourceRange> {
+        self.context_loc
+    }
 }
 
 impl Display for SourceError {

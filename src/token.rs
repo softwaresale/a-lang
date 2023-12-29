@@ -53,6 +53,7 @@ pub enum TokenKind<'input> {
     Mut,
     Return,
     Break,
+    As,
 
     // Other
     Nullable,
@@ -101,6 +102,8 @@ impl<'input> TryFrom<&'input str> for TokenKind<'input> {
             "mut" => Ok(TokenKind::Mut),
             "return" => Ok(TokenKind::Return),
             "break" => Ok(TokenKind::Break),
+            "as" => Ok(TokenKind::As),
+            "composes" => Ok(TokenKind::Composes),
             _ => Err(value)
         }
     }

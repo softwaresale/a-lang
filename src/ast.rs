@@ -16,7 +16,7 @@ pub struct FunctionDeclarationNode {
     /// the parameters given to this function
     pub(crate) params: Vec<Box<Ast>>,
     /// the return type of this function
-    pub(crate) ret_tp: Type,
+    pub(crate) ret_tp: Box<Ast>,
     /// The function body
     pub(crate) body: Box<Ast>,
     /// location in source where this node occurs
@@ -40,7 +40,7 @@ pub struct FieldDeclarationNode {
     /// the name of this field
     pub(crate) name: Box<Ast>,
     /// the given type
-    pub(crate) tp: Type,
+    pub(crate) tp: Box<Ast>,
     /// location in source where this node occurs
     pub(crate) location: SourceRange,
 }
@@ -72,7 +72,7 @@ pub struct ParamNode {
     /// name of this parameter
     pub(crate) name: Box<Ast>,
     /// the type of this parameter
-    pub(crate) tp: Type,
+    pub(crate) tp: Box<Ast>,
     /// location in source where this node occurs
     pub(crate) location: SourceRange,
 }

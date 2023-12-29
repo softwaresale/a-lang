@@ -2,9 +2,10 @@ mod expr;
 mod funs;
 mod stmt;
 mod tp;
+mod object;
 
 use std::collections::HashMap;
-use crate::ast::{Ast};
+use crate::ast::{Ast, CompilationUnitNode};
 use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
 use crate::lexer::token_stream::TokenStream;
@@ -31,11 +32,49 @@ impl<'input> Parser<'input> {
 
     // parse rules
     pub fn parse_compilation_unit(mut self) -> Result<Box<Ast>, Vec<SourceError>> {
-        let parse_result = self.parse_expr();
-        match parse_result {
-            Ok(ast) => Ok(ast),
-            Err(_) => Err(self.errors)
+        match self.parse_top_level_decls() {
+            Ok(ast) => {
+                Ok(ast)
+            }
+            Err(_) => {
+                Err(self.errors)
+            }
         }
+    }
+
+    fn parse_top_level_decls(&mut self) -> ParseResult {
+        let mut decls = Vec::<Box<Ast>>::new();
+        loop {
+            let next = self.tokens.peek();
+            if next.is_none() {
+                break;
+            }
+
+            let next = next.unwrap();
+            let next_defn = match next.kind {
+                TokenKind::FunDecl => self.parse_fun_defn(),
+                TokenKind::ObjDecl => self.parse_object_decl(),
+                tok => Err(ParseErr::Fatal(SourceError::new(format!("Unexpected token {:?}", tok), next.location)))
+            };
+
+            match next_defn {
+                Ok(valid_def) => {
+                    decls.push(valid_def);
+                }
+                Err(parse_err) => {
+                    let err = parse_err.into();
+                    // TODO consider de-duplicating this...
+                    self.errors.push(err);
+
+                    // skip to the next def
+                    self.tokens.skip_to(|tok| tok.kind == TokenKind::FunDecl || tok.kind == TokenKind::ObjDecl);
+                }
+            }
+        }
+
+        Ok(Ast::CompilationUnit(CompilationUnitNode {
+            declarations: decls,
+        }).into())
     }
 
     // parsing utilities

@@ -1,7 +1,14 @@
 
-if (true) {
-    let age = 10;
-    let name = "Charlie";
-} else {
-    let age = 11;
+object Person {
+    name: str;
+    age: uint;
+}
+
+object Student composes Person {
+    gpa: double;
+}
+
+fun main() {
+    let age = 12;
+    age
 }

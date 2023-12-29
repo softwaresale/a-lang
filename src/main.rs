@@ -53,7 +53,8 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
         Err(errors) => {
             eprintln!("Parsing error occurred");
             for error in errors {
-                eprintln!("Error: {}", error)
+                let report = source_input.create_error_report(error);
+                eprintln!("{}", report);
             }
         }
     }
