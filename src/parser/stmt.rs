@@ -1,5 +1,6 @@
-use crate::ast::{AssignmentNode, Ast, TypeSpecNode, VariableDeclarationNode, WhileNode};
+use crate::ast::{AssignmentNode, Ast, LitNode, ReturnNode, TypeSpecNode, VariableDeclarationNode, WhileNode};
 use crate::error::parse::ParseErr;
+use crate::literal::Literal;
 use crate::location::SourceRange;
 use crate::parser::{Parser, ParseResult};
 use crate::token::TokenKind;
@@ -22,6 +23,7 @@ impl<'input> Parser<'input> {
         let stmt_result = self.one_of([
             Self::parse_block,
             Self::parse_while,
+            Self::parse_return_stmt,
             Self::parse_assignment_stmt,
             Self::parse_expr_stmt,
         ]);
@@ -33,6 +35,27 @@ impl<'input> Parser<'input> {
                 Err(err)
             }
         }
+    }
+
+    /// <return_stmt> ::= "return" <expr>?
+    fn parse_return_stmt(&mut self) -> ParseResult {
+        let start_loc = self.tokens.accept(TokenKind::Return)
+            .map(|tok| tok.location)
+            .map_err(|err| ParseErr::NonFatal(err))?;
+
+        let (ret_value, loc) = if self.tokens.check_next(|tok| tok.kind == TokenKind::Semicolon) {
+            let ret = Box::new(Ast::Literal(LitNode { lit: Literal::Unit, location: SourceRange::default() }));
+            (ret, start_loc)
+        } else {
+            let ret = self.parse_expr()?;
+            let loc = SourceRange::spanned(&start_loc, ret.as_ref());
+            (ret, loc)
+        };
+
+        Ok(Ast::Return(ReturnNode {
+            expr: ret_value,
+            location: loc,
+        }).into())
     }
 
     fn parse_assignment_stmt(&mut self) -> ParseResult {
