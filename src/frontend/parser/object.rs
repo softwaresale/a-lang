@@ -1,8 +1,8 @@
-use crate::ast::{Ast, CompositionSpecNode, FieldDeclarationNode, ObjectDeclarationNode};
+use crate::frontend::ast::{Ast, CompositionSpecNode, FieldDeclarationNode, ObjectDeclarationNode};
 use crate::error::parse::ParseErr;
-use crate::location::{HasLocation, SourceRange};
-use crate::parser::{Parser, ParseResult};
-use crate::token::TokenKind;
+use crate::frontend::location::{HasLocation, SourceRange};
+use crate::frontend::parser::{Parser, ParseResult};
+use crate::frontend::token::TokenKind;
 
 impl<'input> Parser<'input> {
 

@@ -1,8 +1,8 @@
-use crate::ast::{Ast, FunCallNode, FunctionDeclarationNode, NamedArgNode, ParamNode, TypeSpecNode};
+use crate::frontend::ast::{Ast, FunCallNode, FunctionDeclarationNode, NamedArgNode, ParamNode, TypeSpecNode};
 use crate::error::parse::ParseErr;
-use crate::location::SourceRange;
-use crate::parser::{Parser, ParseResult};
-use crate::token::{Token, TokenKind};
+use crate::frontend::location::SourceRange;
+use crate::frontend::parser::{Parser, ParseResult};
+use crate::frontend::token::{TokenKind};
 use crate::types::Type;
 
 /// parsers related to functions

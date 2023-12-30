@@ -2,8 +2,8 @@ use std::fmt::Write;
 use std::iter::zip;
 use std::ops::Range;
 use crate::error::source::SourceError;
-use crate::input::SourceInput;
-use crate::location::{SourceLocation, SourceRange};
+use crate::frontend::input::SourceInput;
+use crate::frontend::location::{SourceLocation, SourceRange};
 
 struct AnnotationRange {
     lines: Range<usize>,

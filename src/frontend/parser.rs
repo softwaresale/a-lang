@@ -5,11 +5,11 @@ mod tp;
 mod object;
 
 use std::collections::HashMap;
-use crate::ast::{Ast, CompilationUnitNode};
+use crate::frontend::ast::{Ast, CompilationUnitNode};
 use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
-use crate::lexer::token_stream::TokenStream;
-use crate::token::TokenKind;
+use crate::frontend::lexer::token_stream::TokenStream;
+use crate::frontend::token::TokenKind;
 
 pub type ParseResult = Result<Box<Ast>, ParseErr>;
 

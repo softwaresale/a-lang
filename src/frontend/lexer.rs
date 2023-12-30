@@ -6,14 +6,13 @@ mod test;
 
 use std::error::Error;
 use std::iter::Peekable;
-use std::ops::Range;
 use std::str::Chars;
 use crate::error::source::SourceError;
-use crate::input::SourceInput;
-use crate::lexer::token_stream::TokenStream;
-use crate::literal::{Literal, LiteralKind, LiteralRef};
-use crate::location::{SourceLocation, SourceRange};
-use crate::token::{Token, TokenKind};
+use crate::frontend::input::SourceInput;
+use crate::frontend::lexer::token_stream::TokenStream;
+use crate::literal::{LiteralRef};
+use crate::frontend::location::{SourceLocation, SourceRange};
+use crate::frontend::token::{Token, TokenKind};
 
 pub struct Lexer<'input> {
     /// the original source input

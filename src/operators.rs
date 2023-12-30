@@ -1,5 +1,5 @@
 use crate::error::source::SourceError;
-use crate::token::{Token, TokenKind};
+use crate::frontend::token::{Token, TokenKind};
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum UnaryOp {

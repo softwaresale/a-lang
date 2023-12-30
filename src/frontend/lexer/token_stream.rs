@@ -1,7 +1,7 @@
 use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
-use crate::location::SourceRange;
-use crate::token::{Token, TokenKind};
+use crate::frontend::location::SourceRange;
+use crate::frontend::token::{Token, TokenKind};
 
 pub struct TokenStream<'input> {
     /// the actual tokens

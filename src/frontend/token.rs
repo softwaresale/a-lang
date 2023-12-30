@@ -1,6 +1,6 @@
 
 use crate::literal::{LiteralRef};
-use crate::location::{HasLocation, SourceLocation, SourceRange};
+use crate::frontend::location::{HasLocation, SourceRange};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TokenKind<'input> {

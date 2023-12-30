@@ -1,22 +1,17 @@
 mod args;
-mod ast;
 mod error;
-mod input;
-mod lexer;
 mod literal;
-mod location;
 mod operators;
 mod types;
-mod token;
-mod parser;
+mod frontend;
 
 use std::error::Error;
 use std::process::ExitCode;
 use clap::Parser as ClapParser;
 use crate::args::ProgramArgs;
-use crate::input::SourceInput;
-use crate::lexer::Lexer;
-use crate::parser::{Parser};
+use crate::frontend::input::SourceInput;
+use crate::frontend::lexer::Lexer;
+use crate::frontend::parser::{Parser};
 
 fn main() -> Result<ExitCode, Box<dyn Error>> {
 

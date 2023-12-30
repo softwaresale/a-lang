@@ -1,4 +1,3 @@
-use std::error::Error;
 use crate::error::source::SourceError;
 
 /// determine what kind of parser error we encounter

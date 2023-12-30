@@ -1,8 +1,8 @@
-use crate::ast::{Ast, TypeSpecNode};
+use crate::frontend::ast::{Ast, TypeSpecNode};
 use crate::error::parse::ParseErr;
-use crate::location::{HasLocation, SourceRange};
-use crate::parser::{Parser, ParseResult};
-use crate::token::TokenKind;
+use crate::frontend::location::{HasLocation, SourceRange};
+use crate::frontend::parser::{Parser, ParseResult};
+use crate::frontend::token::TokenKind;
 use crate::types::Type;
 
 impl<'input> Parser<'input> {

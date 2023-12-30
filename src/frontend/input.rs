@@ -6,7 +6,7 @@ use std::io::{BufReader, Read};
 use std::ops::{Range, RangeInclusive};
 use std::path::PathBuf;
 use crate::error::internal::InternalError;
-use crate::location::{SourceLocation, SourceRange};
+use crate::frontend::location::{SourceLocation, SourceRange};
 
 pub enum SourceInputKind {
     /// The input came from a file

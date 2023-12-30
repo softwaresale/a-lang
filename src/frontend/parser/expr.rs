@@ -1,11 +1,11 @@
-use crate::ast::{ArrayAccessNode, Ast, BinaryOpNode, CondExprNode, IdentNode, LitNode, UnaryOpNode};
+use crate::frontend::ast::{ArrayAccessNode, Ast, BinaryOpNode, CondExprNode, IdentNode, LitNode, UnaryOpNode};
 use crate::error::parse::ParseErr;
 use crate::error::source::SourceError;
 use crate::literal::{Literal};
-use crate::location::SourceRange;
+use crate::frontend::location::SourceRange;
 use crate::operators::{BinaryOp, UnaryOp};
-use crate::parser::{Parser, ParseResult};
-use crate::token::TokenKind;
+use crate::frontend::parser::{Parser, ParseResult};
+use crate::frontend::token::TokenKind;
 
 /// The expression parser
 

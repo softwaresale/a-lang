@@ -1,9 +1,9 @@
-use crate::ast::{AssignmentNode, Ast, LitNode, ReturnNode, TypeSpecNode, VariableDeclarationNode, WhileNode};
+use crate::frontend::ast::{AssignmentNode, Ast, LitNode, ReturnNode, TypeSpecNode, VariableDeclarationNode, WhileNode};
 use crate::error::parse::ParseErr;
 use crate::literal::Literal;
-use crate::location::SourceRange;
-use crate::parser::{Parser, ParseResult};
-use crate::token::TokenKind;
+use crate::frontend::location::SourceRange;
+use crate::frontend::parser::{Parser, ParseResult};
+use crate::frontend::token::TokenKind;
 use crate::types::{Type, VariableDeclarationMode};
 
 impl<'input> Parser<'input> {

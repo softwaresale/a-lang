@@ -1,5 +1,5 @@
 use crate::literal::Literal;
-use crate::location::{HasLocation, SourceRange};
+use crate::frontend::location::{HasLocation, SourceRange};
 use crate::operators::{BinaryOp, UnaryOp};
 use crate::types::{Type, VariableDeclarationMode};
 
@@ -208,7 +208,7 @@ pub enum Ast {
 impl HasLocation for Ast {
     fn source_range(&self) -> SourceRange {
         match self {
-            Ast::CompilationUnit(node) => SourceRange::default(),
+            Ast::CompilationUnit(_) => SourceRange::default(),
             Ast::FunctionDeclaration(node) => node.location,
             Ast::ObjectDeclaration(node) => node.location,
             Ast::FieldDeclaration(node) => node.location,

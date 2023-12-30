@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use crate::location::{SourceRange};
+use crate::frontend::location::{SourceRange};
 
 #[derive(Debug, Clone)]
 pub struct SourceError {
