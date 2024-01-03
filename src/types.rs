@@ -1,11 +1,13 @@
+use std::collections::HashMap;
+use crate::literal::Literal;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunParam {
     pub(crate) tp: Box<Type>,
     pub(crate) name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunType {
     /// the return type of this function
     pub(crate) ret: Box<Type>,
@@ -13,7 +15,19 @@ pub struct FunType {
     pub(crate) args: Vec<FunParam>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+pub struct ObjectType {
+    /// name of the object
+    /// TODO this can probably be omitted
+    pub(crate) name: String,
+    /// the properties on this object
+    pub(crate) props: HashMap<String, Box<Type>>,
+    /// the composed types with this object
+    /// TODO might need some reworking
+    pub(crate) comps: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone)]
 pub enum Type {
     /// type is unknown at compile time
     Unknown,
@@ -41,6 +55,8 @@ pub enum Type {
     Optional(Box<Type>),
     /// functional type
     Function(FunType),
+    /// Object type
+    Object(ObjectType),
     /// A sized array type
     Array(Box<Type>, usize),
     /// A variable sized, non-owning view of contiguous memory
@@ -66,8 +82,23 @@ impl From<&str> for Type {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum VariableDeclarationMode {
     Const,
     Mutable,
+}
+
+impl From<Literal> for Type {
+    fn from(value: Literal) -> Self {
+        match value {
+            Literal::Unit => Type::Unit,
+            // TODO not sure how to type this...
+            Literal::Null => Type::Optional(Type::Unknown.into()),
+            Literal::Boolean(_) => Type::Boolean,
+            Literal::Char(_) => Type::Char,
+            Literal::Int(_) => Type::UInt,
+            Literal::Double(_) => Type::Double,
+            Literal::String(_) => Type::String,
+        }
+    }
 }

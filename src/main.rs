@@ -4,14 +4,15 @@ mod literal;
 mod operators;
 mod types;
 mod frontend;
+mod analysis;
+mod symtab;
 
 use std::error::Error;
-use std::process::ExitCode;
+use std::process::{ExitCode, ExitStatus};
 use clap::Parser as ClapParser;
 use crate::args::ProgramArgs;
 use crate::frontend::input::SourceInput;
-use crate::frontend::lexer::Lexer;
-use crate::frontend::parser::{Parser};
+use crate::frontend::parse_input_source;
 
 fn main() -> Result<ExitCode, Box<dyn Error>> {
 
@@ -28,31 +29,21 @@ fn main() -> Result<ExitCode, Box<dyn Error>> {
         return Ok(ExitCode::FAILURE);
     }
 
-    // eagerly read into tokens
-    let token_stream = Lexer::new(&source_input)
-        .into_token_stream()?;
+    let ast = parse_input_source(&source_input);
 
-    println!("--Tokens--");
-    for token in token_stream.tokens() {
-        println!("{:?}", token)
-    }
-    println!("--End Tokens--");
+    let Ok(ast) = ast else {
+        let errors = ast.unwrap_err();
+        eprintln!("Parsing error occurred");
+        for error in errors {
+            let report = source_input.create_error_report(error);
+            eprintln!("{}", report);
+        }
 
-    let parser = Parser::new(token_stream);
-    let ast = parser.parse_compilation_unit();
-    match ast {
-        Ok(ast) => {
-            println!("--AST--");
-            println!("{:#?}", ast);
-        }
-        Err(errors) => {
-            eprintln!("Parsing error occurred");
-            for error in errors {
-                let report = source_input.create_error_report(error);
-                eprintln!("{}", report);
-            }
-        }
-    }
+        return Ok(ExitCode::FAILURE)
+    };
+
+    println!("--AST--");
+    println!("{:#?}", ast);
 
     Ok(ExitCode::SUCCESS)
 }

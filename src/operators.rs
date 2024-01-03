@@ -1,7 +1,7 @@
 use crate::error::source::SourceError;
 use crate::frontend::token::{Token, TokenKind};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum UnaryOp {
     /// bitwise negation
     BitNeg,
@@ -15,7 +15,7 @@ pub enum UnaryOp {
     Ref,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum BinaryOp {
     // Arith
     Plus,

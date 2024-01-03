@@ -1,15 +1,17 @@
+pub mod visitor;
+
 use crate::literal::Literal;
 use crate::frontend::location::{HasLocation, SourceRange};
 use crate::operators::{BinaryOp, UnaryOp};
 use crate::types::{Type, VariableDeclarationMode};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CompilationUnitNode {
     /// list of declarations
     pub(crate) declarations: Vec<Box<Ast>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionDeclarationNode {
     /// function name
     pub(crate) name: Box<Ast>,
@@ -23,7 +25,7 @@ pub struct FunctionDeclarationNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ObjectDeclarationNode {
     /// the name of this type
     pub(crate) name: Box<Ast>,
@@ -35,7 +37,7 @@ pub struct ObjectDeclarationNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FieldDeclarationNode {
     /// the name of this field
     pub(crate) name: Box<Ast>,
@@ -45,7 +47,7 @@ pub struct FieldDeclarationNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CompositionSpecNode {
     /// the type being composed
     pub(crate) composed_type: Box<Ast>,
@@ -55,7 +57,7 @@ pub struct CompositionSpecNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VariableDeclarationNode {
     /// how this variable is declared
     pub(crate) decl_mode: VariableDeclarationMode,
@@ -67,7 +69,7 @@ pub struct VariableDeclarationNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParamNode {
     /// name of this parameter
     pub(crate) name: Box<Ast>,
@@ -77,7 +79,7 @@ pub struct ParamNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AssignmentNode {
     pub(crate) decl: Box<Ast>,
     pub(crate) rhs: Box<Ast>,
@@ -85,7 +87,7 @@ pub struct AssignmentNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnaryOpNode {
     pub(crate) op: UnaryOp,
     pub(crate) child: Box<Ast>,
@@ -93,7 +95,7 @@ pub struct UnaryOpNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BinaryOpNode {
     pub(crate) op: BinaryOp,
     pub(crate) lhs: Box<Ast>,
@@ -102,7 +104,7 @@ pub struct BinaryOpNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CondExprNode {
     /// the condition to evaluation
     pub(crate) cond: Box<Ast>,
@@ -114,7 +116,7 @@ pub struct CondExprNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunCallNode {
     /// the function being called
     pub(crate) fun_name: Box<Ast>,
@@ -124,7 +126,7 @@ pub struct FunCallNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NamedArgNode {
     /// the argument we are passing to
     pub(crate) param_name: Box<Ast>,
@@ -134,7 +136,7 @@ pub struct NamedArgNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WhileNode {
     /// the condition to evaluate each time
     pub(crate) cond: Box<Ast>,
@@ -144,27 +146,27 @@ pub struct WhileNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IdentNode {
     pub(crate) ident: String,
     /// location in source where this node occurs
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LitNode {
     pub(crate) lit: Literal,
     /// location in source where this node occurs
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ReturnNode {
     pub(crate) expr: Box<Ast>,
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ArrayAccessNode {
     /// the expression being accessed
     pub(crate) derefed: Box<Ast>,
@@ -174,14 +176,14 @@ pub struct ArrayAccessNode {
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TypeSpecNode {
     /// the type of this spec
     pub(crate) tp: Type,
     pub(crate) location: SourceRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Ast {
     CompilationUnit(CompilationUnitNode),
     FunctionDeclaration(FunctionDeclarationNode),
@@ -233,5 +235,23 @@ impl HasLocation for Ast {
             Ast::ArrayAccess(node) => node.location,
             Ast::TypeSpec(node) => node.location,
         }
+    }
+}
+
+impl Ast {
+    pub fn into_ident(self) -> IdentNode {
+        let Self::Identifier(ident_node) = self else {
+            panic!("Expected identifier, but something else")
+        };
+        
+        ident_node
+    }
+    
+    pub fn into_field_decl(self) -> FieldDeclarationNode {
+        let Self::FieldDeclaration(node) = self else {
+            panic!("Expected field decl, but something else")
+        };
+
+        node
     }
 }

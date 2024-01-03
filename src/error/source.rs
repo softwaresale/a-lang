@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use crate::frontend::location::{SourceRange};
+use crate::frontend::location::{HasLocation, SourceRange};
 
 #[derive(Debug, Clone)]
 pub struct SourceError {
@@ -13,10 +13,10 @@ pub struct SourceError {
 }
 
 impl SourceError {
-    pub fn new<StrT: Into<String>>(msg: StrT, loc: SourceRange) -> Self {
+    pub fn new<StrT: Into<String>, RangeT: HasLocation>(msg: StrT, loc: RangeT) -> Self {
         Self {
             msg: msg.into(),
-            err_loc: loc,
+            err_loc: loc.source_range(),
             context_loc: None,
         }
     }
